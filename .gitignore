@@ -1,0 +1,9 @@
+
+
+# Stupid Mac Stuff #
+####################
+.DS_Store
+
+# Compiled sources #
+####################
+*.class
