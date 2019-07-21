@@ -3,13 +3,21 @@ import java.util.*;
 
 public class ShadowlambClient extends IRCCommunicator {
 
+	private IRCConf ircConf;
 	private ShadowlambConf clientConf;
 	private boolean startingUp = true;
 	private boolean playingGame = false;
+	private static boolean waiting = false;
+	private ShadowlambTravelDialogManager travelDlgMnger = new ShadowlambTravelDialogManager();
+	private ShadowlambBattleDialog battleDlgMnger = new ShadowlambBattleDialog();
+	private ShadowlambAttributeManager attrDlgMnger = new ShadowlambAttributeManager();
+	private ShadowlambKarmaManager karmaMnger = new ShadowlambKarmaManager();
+	private ShadowlambLocationManager locationMnger = new ShadowlambLocationManager();
 	
 	public ShadowlambClient(IRCConf conf, ShadowlambConf clientConf) {
 		super(conf);
 		this.clientConf = clientConf;
+		ircConf = conf;
 	}
 
 	public void sendGameCommand(String command, ArrayList<String> options) {
@@ -24,11 +32,7 @@ public class ShadowlambClient extends IRCCommunicator {
 				if(parsed.getContent().contains("Looking")) {
 					setUser(clientConf.getUsername(), "0", "*", ":"+clientConf.getUsername());
 				} else if(parsed.getContent().contains("please choose a different nick.")) {
-					try {
-						privmsg("NickServ", "identify " + clientConf.getPassword());
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					privmsg("NickServ", "identify " + clientConf.getPassword());
 				}
 				break;
 			case "ping":
@@ -135,7 +139,7 @@ public class ShadowlambClient extends IRCCommunicator {
 
 	public static void main(String[] args) {
 		IRCConf ircConf = new IRCConf("irc.wechall.net", 6668, "#shadowlamb");
-		ShadowlambConf shadowBotConf = new ShadowlambConf("ShadowBot", "12345");
+		ShadowlambConf shadowBotConf = new ShadowlambConf("f0rk", "12345", "halftroll", "male");
 		ShadowlambClient client = new ShadowlambClient(ircConf, shadowBotConf);
 		try {
 			client.setNick(":" + shadowBotConf.getUsername());
