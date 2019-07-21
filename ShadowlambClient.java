@@ -3,11 +3,17 @@ import java.util.*;
 
 public class ShadowlambClient extends IRCCommunicator {
 
-	ShadowlambConf clientConf;
+	private ShadowlambConf clientConf;
+	private boolean startingUp = true;
+	private boolean playingGame = false;
 	
 	public ShadowlambClient(IRCConf conf, ShadowlambConf clientConf) {
 		super(conf);
 		this.clientConf = clientConf;
+	}
+
+	public void sendGameCommand(String command, ArrayList<String> options) {
+
 	}
 
 	public void processMessage(String ircMessage) {
@@ -39,7 +45,31 @@ public class ShadowlambClient extends IRCCommunicator {
 				if(parsed.getContent().contains("+r")) {
 					joinChannel("#shadowlamb");
 				}
+				break;
+			default:
+				break;
 		}
+	}
+
+	public void playGame(String ircMessage) {
+		IRCParserOutput ircParsed = IRCParser.parse(ircMessage);
+		ShadowlambGameParser parser = new ShadowlambGameParser(ircParsed);
+
+		switch(parser.getAction()) {
+			default:
+				break;
+		}
+	}
+
+	@Override
+	protected void joinChannel(String channel) {
+		if(channel.equals("#shadowlamb")) {
+			startingUp = false;
+			playingGame = true;
+		}
+		ArrayList<String> options = new ArrayList<>();
+		options.add(channel);
+		sendCommand("JOIN", options);
 	}
 
 	@Override 
@@ -47,13 +77,12 @@ public class ShadowlambClient extends IRCCommunicator {
 		InputStream stream = null;
 
 		try {
-
 			stream = conn.getInputStream();
 			MessageBuffer messageBuffer = new MessageBuffer();
 			byte[] buffer = new byte[512];
 			int count;
 			
-			while (true) {
+			while (startingUp) {
 				count = stream.read(buffer);
 				if (count == -1)
 					break;
@@ -63,6 +92,19 @@ public class ShadowlambClient extends IRCCommunicator {
 
                     System.out.println("\"" + ircMessage + "\"");
 					processMessage(ircMessage);
+				}
+			}
+
+			while(playingGame) {
+				count = stream.read(buffer);
+				if (count == -1)
+					break;
+				messageBuffer.append(Arrays.copyOfRange(buffer, 0, count));
+				while (messageBuffer.hasCompleteMessage()) {
+					String ircMessage = messageBuffer.getNextMessage();
+
+                    System.out.println("\"" + ircMessage + "\"");
+					playGame(ircMessage);
 				}
 			}
 		} catch (Exception e) {
