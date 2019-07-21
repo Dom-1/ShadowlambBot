@@ -54,11 +54,32 @@ public class ShadowlambClient extends IRCCommunicator {
 	public void playGame(String ircMessage) {
 		IRCParserOutput ircParsed = IRCParser.parse(ircMessage);
 		ShadowlambGameParser parser = new ShadowlambGameParser(ircParsed);
+		parser.run();
+
+		if(ircParsed.getCommand().equals("ping")) {
+			pong(ircParsed.getTarget());
+		}
 
 		switch(parser.getAction()) {
+			case "init":
+				privmsg(ircConf.getChannel(), "#start " + clientConf.getRace() + " " + clientConf.getGender());
+				break;
+			case "start":
+				privmsg(ircConf.getChannel(), "#enable bot");
+				privmsg(ircConf.getChannel(), "#exp");
+			case "status":
+				privmsg(ircParsed.getChannel(), "#status");
+				break;
+			case "startGoing":
+				travelDlgMnger.setMsg(ircParsed.getContent());
+				break;
 			default:
 				break;
 		}
+	}
+
+	public static void switchWaiting() {
+		waiting = !waiting;
 	}
 
 	@Override
