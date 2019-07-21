@@ -29,10 +29,12 @@ public class ShadowlambGameParser {
 				action = "init";
 			} else if(output.getContent().contains("ETA:")) {
 				action = "startGoing";
+			} else if(output.getContent().contains("HP:")) {
+				action = "checkHP";
 			} else if(output.getContent().contains("This is a test")) {
+				action = "explore";
+			} else if(output.getContent().contains("You explored Redmond again, but it seems you know every single corner of it")) {
 				action = "status";
-			} else if(output.getContent().contains("")) {
-				
 			} else {
 				action = "nothing";
 			}

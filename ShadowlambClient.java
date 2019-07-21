@@ -7,12 +7,13 @@ public class ShadowlambClient extends IRCCommunicator {
 	private ShadowlambConf clientConf;
 	private boolean startingUp = true;
 	private boolean playingGame = false;
-	private static boolean waiting = false;
+	private boolean waiting = false;
 	private ShadowlambTravelDialogManager travelDlgMnger = new ShadowlambTravelDialogManager();
 	private ShadowlambBattleDialog battleDlgMnger = new ShadowlambBattleDialog();
 	private ShadowlambAttributeManager attrDlgMnger = new ShadowlambAttributeManager();
 	private ShadowlambKarmaManager karmaMnger = new ShadowlambKarmaManager();
 	private ShadowlambLocationManager locationMnger = new ShadowlambLocationManager();
+	private Timer timer = new Timer();
 	
 	public ShadowlambClient(IRCConf conf, ShadowlambConf clientConf) {
 		super(conf);
@@ -63,27 +64,63 @@ public class ShadowlambClient extends IRCCommunicator {
 		if(ircParsed.getCommand().equals("ping")) {
 			pong(ircParsed.getTarget());
 		}
-
+		if(!waiting){
 		switch(parser.getAction()) {
 			case "init":
 				privmsg(ircConf.getChannel(), "#start " + clientConf.getRace() + " " + clientConf.getGender());
 				break;
-			case "start":
-				privmsg(ircConf.getChannel(), "#enable bot");
+			case "explore":
 				privmsg(ircConf.getChannel(), "#exp");
+				break;
+			case "checkHP":
+				String msg = ircParsed.getContent();
+				double hp = Double.parseDouble(msg.substring(msg.indexOf(':'), msg.indexOf('/')));
+				if(hp < 15) {
+					switchWaiting();
+					gotoHotel(ircConf.getChannel());
+				}
+				break;
+			case "atHotel":
+				switchWaiting();
+				sleep();
+				break;
 			case "status":
-				privmsg(ircParsed.getChannel(), "#status");
+				privmsg(ircConf.getChannel(), "#status");
 				break;
 			case "startGoing":
 				travelDlgMnger.setMsg(ircParsed.getContent());
 				break;
+			case "repeatLoop":
+				
+				break;
 			default:
 				break;
+			}
 		}
 	}
 
-	public static void switchWaiting() {
+	public void switchWaiting() {
 		waiting = !waiting;
+	}
+
+	private void gotoHotel(String to) {		
+		privmsg(to, "#g 1");
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				switchWaiting();
+			}
+		}, 1000*60*5);
+	}
+
+	private void sleep() {
+		privmsg(ircConf.getChannel(), "#sleep");
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				switchWaiting();
+			}
+		}, 1000*60*3);
 	}
 
 	@Override
