@@ -24,7 +24,7 @@ public class IRCParser {
 		
 		output.setCommand(msg.substring(0, spIndex).toLowerCase());
 		msg = msg.substring(spIndex + 1);
-		
+
 		// parse privmsg params
 		if (output.getCommand().equals("privmsg")) {
 			spIndex = msg.indexOf(' ');
@@ -75,13 +75,19 @@ public class IRCParser {
 
 		if(output.getCommand().equals("mode")) {
 			spIndex = msg.indexOf(' ');
-			System.out.println("made it");
 			if(spIndex > -1) {
 				output.setContent(msg.substring(spIndex));
 			} else {
 				output.setContent(msg);
 			}
 		}
+
+		try {
+			if(Integer.parseInt(output.getCommand()) > 0) {
+				output.setContent(msg);
+			}
+		} catch (Exception e) {}
+
 		return output;
 	}
 }
