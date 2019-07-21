@@ -14,6 +14,7 @@ Key phrases:
 You know a new Place: <place>
 ENCOUNTER
 You received <item> from looting <enemy[id]>
+You meet <player (npc|player)>[id](distance)(<level>)
 
 
 #cc: ccommands
