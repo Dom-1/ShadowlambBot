@@ -120,7 +120,7 @@ public class ShadowlambClient extends IRCCommunicator {
 			public void run() {
 				switchWaiting();
 			}
-		}, 1000*60*8);
+		}, 1000*60*4);
 	}
 
 	private void sleep() {

@@ -40,12 +40,15 @@ public class ShadowlambGameParser {
 				action = "status";
 			} else if(output.getContent().contains("You explored Redmond again, but it seems you know every single corner of it")) {
 				action = "status";
+			} else if(output.getContent().contains("breakfast")){
+				action = "explore";
 			} else if(output.getContent().contains("You enter the Redmond Hotel")){
 				action = "atHotel";
 			} else {
 				action = "nothing";
 			}
-		}
+		} // You cannot move because
+		  // breakfast
 	}
 
 	// public void harvestStatus();
