@@ -74,15 +74,25 @@ public class ShadowlambClient extends IRCCommunicator {
 				break;
 			case "checkHP":
 				String msg = ircParsed.getContent();
-				double hp = Double.parseDouble(msg.substring(msg.indexOf(':'), msg.indexOf('/')));
-				if(hp < 15) {
+				double hp = Double.parseDouble(msg.substring(msg.indexOf(':', 10)+1, msg.indexOf('/')));
+				System.out.println("[CheckHP]: " + hp);
+				if(hp < 15.0) {
+					System.out.println("[CheckHP]: " + "Going to rest");
 					switchWaiting();
 					gotoHotel(ircConf.getChannel());
+				} else {
+					privmsg(ircConf.getChannel(), "#exp");
 				}
 				break;
 			case "atHotel":
 				switchWaiting();
 				sleep();
+				break;
+			case "fight":
+				verbose = true;
+				break;
+			case "doneFighting":
+				verbose = false;
 				break;
 			case "status":
 				privmsg(ircConf.getChannel(), "#status");
@@ -110,7 +120,7 @@ public class ShadowlambClient extends IRCCommunicator {
 			public void run() {
 				switchWaiting();
 			}
-		}, 1000*60*5);
+		}, 1000*60*8);
 	}
 
 	private void sleep() {
@@ -151,8 +161,8 @@ public class ShadowlambClient extends IRCCommunicator {
 				messageBuffer.append(Arrays.copyOfRange(buffer, 0, count));
 				while (messageBuffer.hasCompleteMessage()) {
 					String ircMessage = messageBuffer.getNextMessage();
-
-                    System.out.println("\"" + ircMessage + "\"");
+					if(verbose)
+                    	System.out.println("\"" + ircMessage + "\"");
 					processMessage(ircMessage);
 				}
 			}
@@ -164,8 +174,8 @@ public class ShadowlambClient extends IRCCommunicator {
 				messageBuffer.append(Arrays.copyOfRange(buffer, 0, count));
 				while (messageBuffer.hasCompleteMessage()) {
 					String ircMessage = messageBuffer.getNextMessage();
-
-                    System.out.println("\"" + ircMessage + "\"");
+					if(verbose)
+                    	System.out.println("\"" + ircMessage + "\"");
 					playGame(ircMessage);
 				}
 			}
@@ -187,3 +197,6 @@ public class ShadowlambClient extends IRCCommunicator {
 	}
 
 }
+
+
+//3144966952
