@@ -9,6 +9,7 @@ public abstract class IRCCommunicator implements Runnable {
 	String channel;
 	IRCConf conf;
 	boolean startingUp = true;
+	boolean verbose = false;
 
 	IRCCommunicator(IRCConf conf) {
 		this.conf = conf;
@@ -26,8 +27,8 @@ public abstract class IRCCommunicator implements Runnable {
 		for(String option : options) {
 			msg += " " + option;
 		}
-		System.out.println("[Query]: " + msg);
-
+		if(verbose)
+			System.out.println("[Query]: " + msg);
 		byte[] bytes = (msg + "\r\n").getBytes();
 
 		try {
